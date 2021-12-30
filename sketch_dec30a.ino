@@ -9,6 +9,14 @@
 #define BMP280_I2C_ADDRESS (0x76)
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+/*
+ * has following fieds #define'd
+ * 
+ * THINGSPEAK_WRITE_KEY
+ * CHANNEL_NUMBER
+ * WIFI_SSID
+ * WIFI_PASSWORD
+ */
 #include "Secrets.h"
 
 Adafruit_BMP280 bmp280;
@@ -35,7 +43,6 @@ void setup() {
   WiFi.mode(WIFI_STA);
   ThingSpeak.begin(client);
 
-/*
   if (!bmp280.begin(BMP280_I2C_ADDRESS))
   {
     Serial.println("BMP280 initialization failed");
@@ -45,9 +52,7 @@ void setup() {
     }
   }
   Serial.println("BMP280 initialization successfull");
-*/
   // digitalWrite(SYSTEM_STATUS_LED, HIGH);
-  digitalWrite(WIFI_CONNECTION_LED, LOW);
   // delay(2000);
 }
 
@@ -60,25 +65,20 @@ void loop() {
     
     if (WiFi.status() != WL_CONNECTED)
     {
-      digitalWrite(WIFI_CONNECTION_LED, LOW);
       Serial.print("WiFi not connected, connecting to WiFi...");
       while (WiFi.status() != WL_CONNECTED)
       {
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-        digitalWrite(WIFI_CONNECTION_LED, LOW);
-        delay(2500);
-        digitalWrite(WIFI_CONNECTION_LED, HIGH);
-        delay(2500);
+        delay(5000);
         Serial.print(".");
       }
 
       Serial.println(" Connected successfully...");
-      digitalWrite(WIFI_CONNECTION_LED, HIGH);
     }
     
     temp = lm35_getTemperature(A0);
     pres = 0;
-    // pres = bmp280.readPressure();
+    pres = bmp280.readPressure();
     humid = dht.getHumidity();
     Serial.println("Read values from sensors:");
     Serial.print("Temperature: ");
